@@ -1,6 +1,6 @@
-########################################################################
+################################################################################
 # GRWL_xSections.R
-########################################################################
+################################################################################
 
 
 # Runs through each GRWL centerline and generates a shapefile
@@ -10,7 +10,7 @@
 # Must specify cross section length (e.g. multiple of width)
 
 
-########################################################################
+################################################################################
 # load packages (you must install these before you can run this script):
 require(foreign)
 require(geosphere)
@@ -18,12 +18,12 @@ require(rgdal)
 require(shapefiles)
 
 
-########################################################################
+################################################################################
 # input parameters:
-########################################################################
+################################################################################
 
 # Define working directory: 
-wd = "E:/research/2020_01_01_seasonal_RSSA/git/RSSA_seasonal"
+wd = "E:/research/2020_01_01_RSSA_seasonal/git/RSSA_seasonal"
 
 # multiplier controling length to draw Xsection lines (e.g. 3x GRWL width):
 xLength = 6 
@@ -43,9 +43,9 @@ minSegLen = 28 # n pixels (10 km = ~277 pixels)
 
 
 
-########################################################################
+################################################################################
 # functions:
-########################################################################
+################################################################################
 insertRow <- function(existingDF, newrow, r) {
   existingDF[seq(r+1,length(existingDF)+1)] = 
     existingDF[seq(r,length(existingDF))]
@@ -75,9 +75,9 @@ spatialJumps <- function(tab, lag=1){
 }
 
 
-########################################################################
+################################################################################
 # get list of dbf files to alter:
-########################################################################
+################################################################################
 dbfPs = list.files(dbfD, 'dbf', full.names=T)
 dbfNs = list.files(dbfD, 'dbf', full.names=F)
 prjPs = sub('dbf', 'prj', dbfPs)
@@ -89,13 +89,13 @@ outPrjPs = paste0(outPs, ".prj")
 # if necessary, make output directory:
 if (!dir.exists(outD)){dir.create(outD)}
 
-########################################################################
+################################################################################
 # for each GRWL shapefile, run process:
 print(paste("N shapefies to process:", length(dbfPs)))
 
 for (h in 1:length(dbfPs)){ # h = 190 #yellow  h = 528 # Lena # h= grep("SB20", dbfPs)
   
-  ########################################################################
+  ################################################################################
   # calculate cross sectional direction at each vertex:
   
   # read in GRWL shapefile dbf: 
@@ -246,7 +246,7 @@ for (h in 1:length(dbfPs)){ # h = 190 #yellow  h = 528 # Lena # h= grep("SB20", 
     
   }
   
-  ########################################################################
+  ################################################################################
   # interpolate/extrapolate any missing width values:
   # this is pretty ugly code.
   
@@ -322,7 +322,7 @@ for (h in 1:length(dbfPs)){ # h = 190 #yellow  h = 528 # Lena # h= grep("SB20", 
   
   # j = which(d > res*n*2)
   
-  ########################################################################
+  ################################################################################
   # convert azimuth to quadrant degree coordinate system 
   # (0 degrees to the right, counter clockwise rotation) :
   q = 90-b
@@ -360,7 +360,7 @@ for (h in 1:length(dbfPs)){ # h = 190 #yellow  h = 528 # Lena # h= grep("SB20", 
   o2x = x - sin(q*pi/180)*xD
   o2y = y + cos(q*pi/180)*xD
   
-  ########################################################################
+  ################################################################################
   # recalculate jumps, this time over a single nextdoor neighbor vertices:
   p1x = x[-l]
   p1y = y[-l]
@@ -408,7 +408,7 @@ for (h in 1:length(dbfPs)){ # h = 190 #yellow  h = 528 # Lena # h= grep("SB20", 
   
   # dev.off() # close writing pdf file
   
-  ########################################################################
+  ################################################################################
   # Prep. for write:
   
   # convert bearing to azimuth:
@@ -439,7 +439,7 @@ for (h in 1:length(dbfPs)){ # h = 190 #yellow  h = 528 # Lena # h= grep("SB20", 
                        width_m=tab$width[xI], xDir=xDir[xI])
   ddShapefile = convert.to.shapefile(dd, ddTable, "ID", 3)
   
-  ########################################################################
+  ################################################################################
   # write shapefile:
   write.shapefile(ddShapefile, outPs[h], arcgis=T)
   
@@ -454,9 +454,9 @@ for (h in 1:length(dbfPs)){ # h = 190 #yellow  h = 528 # Lena # h= grep("SB20", 
 
 
 
-########################################################################
+################################################################################
 # After run, calculate the number of cross sections generated:
-########################################################################
+################################################################################
 outDBFs = list.files(outD, ".dbf", full.names=T)
 nXsec = vector()
 for (i in 1:length(outDBFs)){

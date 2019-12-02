@@ -18,6 +18,8 @@ if (!"foreign" %in% rownames(installed.packages())){
 if (!"zyp" %in% rownames(installed.packages())){
   install.packages("zyp")}; require(zyp)
 
+if (!"ggplot2" %in% rownames(installed.packages())){
+  install.packages("ggplot2")}; require(ggplot2)
 
 ################################################################################
 # Define paths:
@@ -85,8 +87,8 @@ for (h in 1:length(inDBFpaths)){
   tab[, wOccCols] = tab[, wOccCols] *  tab$width_m 
   
   # filter:
-  #f = tab$strmOrder > 3 #& tab$w100 > 0 #& tab$width_m > 100
-   f = 1:nrow(tab)
+  f = tab$strmOrder > 3 & tab$w100 > 0 & tab$width_m > 90
+  #f = 1:nrow(tab)
   
   qTab = tab[f, QrecCols]
   wTab = tab[f, wOccCols]
@@ -185,14 +187,6 @@ for (h in 1:length(inDBFpaths)){
   tsTab = tsTabLog
   tsTab$a = exp(tsTabLog$a)
   
-  # take a quick look at the regression tables: 
-  summary(lsTab)
-  summary(tsTab)
-  
-  summary(lsTab[lsTab$r2 > 0.5, ])
-  summary(tsTab[tsTab$r2 > 0.5, ])
-
-  
   # add these best-fit regressions to shapefile dbf:
   tab$AHG_ls_a = tab$AHG_ls_b = tab$AHG_ls_r2 = 
     tab$AHG_ts_a = tab$AHG_ts_b = tab$AHG_ts_r2 = NA
@@ -215,6 +209,39 @@ system(cmd)
 
 
 
+################################################################################
+# CONCATENATE:
+################################################################################
+# read in each continent and concatenate into a large global table:
+for (h in 1:length(outDBFpaths)){
+  tab = foreign::read.dbf(outDBFpaths[h])
+  print(h)
+  if (h == 1){ 
+    gTab = tab 
+  }else{
+    colMatchInd = match(names(gTab), names(tab))
+    gTab = rbind(gTab, tab[,colMatchInd])
+  }
+  print(paste("n rows:", nrow(gTab)))
+}
+
+
+
+################################################################################
+# Summary Stats:
+################################################################################
+# take a quick look at the regression tables: 
+# lsTab = gTab[,grep("ls_", names(gTab))]
+# summary(lsTab)
+# hist(lsTab$AHG_ls_b[lsTab$AHG_ls_b<5], breaks=100)
+# abline(v=0.26, col=2)
+
+tsTab = gTab[,grep("ts_", names(gTab))]
+summary(tsTab)
+hist(tsTab$AHG_ts_b[tsTab$AHG_ts_b<5], breaks=100)
+abline(v=0.26, col=2)
+
+length(which(!is.na(tsTab$AHG_ts_b)))
 
 
 
